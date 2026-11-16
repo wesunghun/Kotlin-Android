@@ -28,6 +28,7 @@
         android:layout_marginEnd="16dp"
         android:adjustViewBounds="true"
         android:contentDescription="배너"
+        android:onClick="onBannerClick"
         android:src="@drawable/menu_banner1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
