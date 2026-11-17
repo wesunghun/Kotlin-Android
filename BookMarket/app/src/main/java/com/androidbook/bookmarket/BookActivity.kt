@@ -4,7 +4,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.ImageView
@@ -15,6 +14,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.androidbook.bookmarket.cart.CartActivity
+import com.androidbook.bookmarket.model.Book
+import com.androidbook.bookmarket.model.CartRepository
 
 class BookActivity : AppCompatActivity() {
 
@@ -66,8 +68,6 @@ class BookActivity : AppCompatActivity() {
             "BOOK1237" -> imgObj.setImageResource(R.drawable.books_book4)
         }
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         cartplusObj = findViewById(R.id.book_btnAddCart)
         cartplusObj.setOnClickListener {
             val alertDialog = AlertDialog.Builder(this)
@@ -78,10 +78,15 @@ class BookActivity : AppCompatActivity() {
             val listener = DialogInterface.OnClickListener { dialogInterface, i ->
                 when (i) {
                     DialogInterface.BUTTON_POSITIVE -> {
-                        cartCount?.let {
-                            val count = it.text.toString().toIntOrNull() ?: 0
-                            it.text = (count + 1).toString()
-                        }
+                        val book = Book()
+                        book.bookid = bookidObj.text.toString()
+                        book.name = nameObj.text.toString()
+                        book.price = priceObj.text.toString()
+                            .replace("[^0-9]".toRegex(), "").toIntOrNull() ?: 0
+
+                        CartRepository.addCartItems(book)
+                        cartCount?.text = CartRepository.countCartItems().toString()
+
                         dialogInterface.dismiss()
                     }
                     DialogInterface.BUTTON_NEGATIVE -> dialogInterface.cancel()
@@ -94,13 +99,16 @@ class BookActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val inflater: MenuInflater = menuInflater
-        inflater.inflate(R.menu.menu_book, menu)
+        menuInflater.inflate(R.menu.menu_book, menu)
 
         val item = menu?.findItem(R.id.menu_cart)
         item?.setActionView(R.layout.cart_count_layout)
         cartCount = item?.actionView?.findViewById(R.id.cart_count)
+        cartCount?.text = CartRepository.countCartItems().toString()
 
+        item?.actionView?.setOnClickListener {
+            startActivity(Intent(this, CartActivity::class.java))
+        }
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -123,7 +131,7 @@ class BookActivity : AppCompatActivity() {
                 return true
             }
             R.id.menu_cart -> {
-                Toast.makeText(applicationContext, "장바구니 메뉴를 클릭하였습니다", Toast.LENGTH_LONG).show()
+                startActivity(Intent(this, CartActivity::class.java))
                 return true
             }
         }
