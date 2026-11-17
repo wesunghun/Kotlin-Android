@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Chap8</string>
+    <string name="title_custom_dialog">CustomDialog 실습</string>
+    <string name="btn_open_calculator">계산기 불러오기</string>
+</resources>
