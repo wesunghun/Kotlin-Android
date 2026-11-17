@@ -5,5 +5,5 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
-    <style name="Theme.BookMarket" parent="Base.Theme.BookMarket" />
+    <style name="Theme.BookMarket" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
 </resources>
