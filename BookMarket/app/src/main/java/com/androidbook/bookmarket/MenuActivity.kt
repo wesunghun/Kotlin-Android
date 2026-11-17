@@ -5,8 +5,11 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
@@ -14,8 +17,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 
-class MenuActivity : AppCompatActivity(),
-    NavigationView.OnNavigationItemSelectedListener {
+class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     var index = 0
     lateinit var toolbar: Toolbar
@@ -28,8 +30,8 @@ class MenuActivity : AppCompatActivity(),
 
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+        toolbar.setNavigationIcon(R.drawable.icon_navi)
 
-        // 툴바를 상태바 아래로 내리기
         ViewCompat.setOnApplyWindowInsetsListener(toolbar) { v, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.statusBars())
             v.setPadding(0, bars.top, 0, 0)
@@ -78,10 +80,32 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_login -> Toast.makeText(this, "메뉴1 : " + item.title, Toast.LENGTH_SHORT).show()
-            R.id.menu_setting -> Toast.makeText(this, "메뉴2 : " + item.title, Toast.LENGTH_SHORT).show()
-            R.id.menu_myinfo -> Toast.makeText(this, "메뉴3 : " + item.title, Toast.LENGTH_SHORT).show()
+            R.id.menu_login -> {
+                val dialogView = layoutInflater.inflate(R.layout.dialog_login, null)
+                val dialog = AlertDialog.Builder(this)
+                    .setView(dialogView)
+                    .show()
+
+                val loginBtn: Button = dialogView.findViewById(R.id.loginBtn)
+                loginBtn.setOnClickListener {
+                    val tvID: TextView = dialogView.findViewById(R.id.userID)
+                    val tvPW: TextView = dialogView.findViewById(R.id.userPW)
+                    dialog.dismiss()
+                    Toast.makeText(
+                        this,
+                        "아이디: " + tvID.text + " 비밀번호: " + tvPW.text,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+            R.id.menu_myinfo -> {
+                Toast.makeText(this, "메뉴2 : " + item.title, Toast.LENGTH_SHORT).show()
+            }
+            R.id.menu_setting -> {
+                Toast.makeText(this, "메뉴3 : " + item.title, Toast.LENGTH_SHORT).show()
+            }
         }
+
         dLayout.closeDrawers()
         return true
     }

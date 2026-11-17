@@ -1,50 +1,132 @@
 package com.androidbook.bookmarket
 
+import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class BookActivity : AppCompatActivity() {
 
-    // 도서 데이터: 이미지, 도서ID, 도서명, 정가, 출간, 지은이, 설명, 분류
-    private val images = listOf(
-        R.drawable.books_book1, R.drawable.books_book2,
-        R.drawable.books_book3, R.drawable.books_book4
-    )
-    private val infos = listOf(
-        listOf("BOOK1234", "쉽게 배우는 알고리즘", "32,000원", "2024-01-03", "문병로",
-            "알고리즘에 대한 지식을 기반으로 제대로 된 프로그래밍을 하는 이들뿐 아니라, 알고리즘 속에 깃든 여러 가지 생각하는 방법, 자료구조, 테크닉을 통해 체계적으로 생각하는 훈련을 하고자 하는 모든 이를 대상으로 한다.",
-            "IT/모바일"),
-        // 아래 3권은 교재 소스의 실제 값으로 바꾸세요
-        listOf("BOOK0002", "도서 2 제목", "34,000원", "2024-01-01", "지은이2", "도서 2 설명", "IT/모바일"),
-        listOf("BOOK0003", "도서 3 제목", "30,000원", "2024-01-01", "지은이3", "도서 3 설명", "IT/모바일"),
-        listOf("BOOK0004", "도서 4 제목", "28,000원", "2024-01-01", "지은이4", "도서 4 설명", "IT/모바일")
-    )
+    lateinit var imgObj: ImageView
+    lateinit var bookidObj: TextView
+    lateinit var nameObj: TextView
+    lateinit var priceObj: TextView
+    lateinit var dateObj: TextView
+    lateinit var writerObj: TextView
+    lateinit var descriptionObj: TextView
+    lateinit var categoryObj: TextView
+
+    lateinit var cartplusObj: Button
+    var cartCount: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_book)
+        setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.book)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        val index = intent.getIntExtra("index", 0).coerceIn(0, images.size - 1)
+        imgObj = findViewById(R.id.imageView1)
+        bookidObj = findViewById(R.id.book_tv01)
+        nameObj = findViewById(R.id.book_tv02)
+        priceObj = findViewById(R.id.book_tv03)
+        dateObj = findViewById(R.id.book_tv04)
+        writerObj = findViewById(R.id.book_tv05)
+        descriptionObj = findViewById(R.id.book_tv06)
+        categoryObj = findViewById(R.id.book_tv07)
 
-        findViewById<ImageView>(R.id.imageView1).setImageResource(images[index])
+        bookidObj.text = intent.getStringExtra("bookid")
+        nameObj.text = intent.getStringExtra("name")
+        priceObj.text = intent.getStringExtra("price")
+        dateObj.text = intent.getStringExtra("date")
+        writerObj.text = intent.getStringExtra("writer")
+        descriptionObj.text = intent.getStringExtra("description")
+        categoryObj.text = intent.getStringExtra("category")
 
-        val tvIds = listOf(
-            R.id.book_tv01, R.id.book_tv02, R.id.book_tv03, R.id.book_tv04,
-            R.id.book_tv05, R.id.book_tv06, R.id.book_tv07
-        )
-        tvIds.forEachIndexed { i, id ->
-            findViewById<TextView>(id).text = infos[index][i]
+        when (bookidObj.text.toString()) {
+            "BOOK1234" -> imgObj.setImageResource(R.drawable.books_book1)
+            "BOOK1235" -> imgObj.setImageResource(R.drawable.books_book2)
+            "BOOK1236" -> imgObj.setImageResource(R.drawable.books_book3)
+            "BOOK1237" -> imgObj.setImageResource(R.drawable.books_book4)
         }
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        cartplusObj = findViewById(R.id.book_btnAddCart)
+        cartplusObj.setOnClickListener {
+            val alertDialog = AlertDialog.Builder(this)
+            alertDialog.setIcon(R.drawable.icon_dialog)
+            alertDialog.setTitle("장바구니 담기")
+            alertDialog.setMessage("도서를 장바구니에 추가하겠습니까?")
+
+            val listener = DialogInterface.OnClickListener { dialogInterface, i ->
+                when (i) {
+                    DialogInterface.BUTTON_POSITIVE -> {
+                        cartCount?.let {
+                            val count = it.text.toString().toIntOrNull() ?: 0
+                            it.text = (count + 1).toString()
+                        }
+                        dialogInterface.dismiss()
+                    }
+                    DialogInterface.BUTTON_NEGATIVE -> dialogInterface.cancel()
+                }
+            }
+            alertDialog.setPositiveButton("예", listener)
+            alertDialog.setNegativeButton("아니요", listener)
+            alertDialog.show()
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.menu_book, menu)
+
+        val item = menu?.findItem(R.id.menu_cart)
+        item?.setActionView(R.layout.cart_count_layout)
+        cartCount = item?.actionView?.findViewById(R.id.cart_count)
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressedDispatcher.onBackPressed()
+                return true
+            }
+            R.id.menu_home -> {
+                Toast.makeText(applicationContext, "홈으로 메뉴를 클릭하였습니다", Toast.LENGTH_LONG).show()
+                finish()
+                startActivity(Intent(this, MainActivity::class.java))
+                return true
+            }
+            R.id.menu_list -> {
+                Toast.makeText(applicationContext, "도서목록 메뉴를 클릭하였습니다", Toast.LENGTH_LONG).show()
+                finish()
+                startActivity(Intent(this, BooksActivity::class.java))
+                return true
+            }
+            R.id.menu_cart -> {
+                Toast.makeText(applicationContext, "장바구니 메뉴를 클릭하였습니다", Toast.LENGTH_LONG).show()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
