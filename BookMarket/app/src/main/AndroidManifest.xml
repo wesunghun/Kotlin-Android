@@ -40,6 +40,12 @@
         <activity
             android:name=".order.OrderActivity"
             android:exported="false" />
+        <activity
+            android:name=".mypage.MyPageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mypage.MemoActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

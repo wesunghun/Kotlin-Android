@@ -18,5 +18,8 @@
 
     <item
         android:id="@+id/menu_search"
-        android:icon="@drawable/icon_search" android:title="검색" app:actionViewClass="android.widget.SearchView" app:showAsAction="always"/>
+        android:icon="@drawable/icon_search"
+        android:title="검색"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="always"/>
 </menu>
